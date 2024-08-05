@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Loading from "../(site)/loading";
+import Error from "../(site)/error";
 
 // API 응답 인터페이스 정의
 interface SearchResult {
@@ -25,6 +26,7 @@ export default function SearchPage() {
     { id: string; url: string; questionSubject: string }[]
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false); // 로딩 상태 관리
+  const [hasError, setHasError] = useState<boolean>(false); // 에러 상태 관리
 
   // 검색 핸들러
   const handleSearch = async () => {
@@ -35,6 +37,7 @@ export default function SearchPage() {
     }
 
     setIsLoading(true);
+    setHasError(false);
 
     try {
       // API 요청
@@ -51,9 +54,11 @@ export default function SearchPage() {
         setSearchResults(results);
       } else {
         console.error("검색 실패:", data.resultMessage);
+        setHasError(true);
       }
     } catch (error) {
       console.error("에러 발생:", error);
+      setHasError(true);
     } finally {
       setIsLoading(false); // 로딩 상태 업데이트
     }
@@ -80,6 +85,8 @@ export default function SearchPage() {
 
       {isLoading ? (
         <Loading /> // 로딩 컴포넌트 표시
+      ) : hasError ? (
+        <Error /> // 에러 컴포넌트 표시
       ) : (
         <>
           <h2 className="text-xl font-semibold mb-2">검색 결과</h2>
